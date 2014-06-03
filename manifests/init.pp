@@ -81,4 +81,18 @@ class globaleaks {
     timeout     => 1800,
     path        => '/bin:/sbin:/usr/bin:/usr/sbin',
   }
+  service { 'globaleaks':
+    enable  =>  true,
+    ensure  =>  running,
+    require =>  Exec['install-globaleaks'],
+  }
+  file { '/etc/sysctl.conf':
+    content => 'fs.file-max=100000
+',
+  }
+  exec { 'reload-sysctl':
+    command     =>  '/sbin/sysctl -p',
+    refreshonly => true,
+    subscribe   => File['/etc/sysctl.conf'],
+  }
 }
